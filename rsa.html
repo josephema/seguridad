@@ -1,0 +1,274 @@
+
+<html ng-app="miApp">
+//josseph turnil 12931810360
+<style>
+table {
+    border-collapse: collapse;
+}
+
+table, td, th {
+    border: 1px solid black;
+}
+</style>
+    <body>
+        <div ng-controller="miControlador">
+
+             <h1>rsa</h1>
+			 <h3>
+             p: <input type="number" ng-model="pprime" value=5  >
+			
+			 q: <input type="number" ng-model="qprime" value=11   >
+			 </h3>
+			 <h1> eso nos da<h1>
+			 <h3>
+			 n: p*q ={{pprime*qprime}}
+			  <p>
+			 </p>
+			 r:(p-1)*(q-1)={{(pprime-1)*(qprime-1)}}
+			 </h3>
+			<h1> encontrando e <h1>
+			<h3>Se busca un número 'e' (impar) tal que no
+			tenga múltiplos comunes con r.
+			Para esto se selecciona de forma aleatoria un
+			entero 'e', tal que 1 < e < r, MCD( r, e ) = 1.</h3>
+			 e: <input type="number" ng-model="e"  >
+			 <button ng-click="mcd(r,e)"> MCD(r,e)</button>={{mcdrsa}}
+<h1> entonces:  <h1>
+<h3>
+soponemos que e={{e}} y el MCD({{r}},{{e}})={{mcdrsa}}
+</h3>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<h1>CALCULANDO D</h1>
+d: d*e(mod r)=1 usando el metodo extended euclidean
+<div ng-repeat="x in listDproces">
+<table>
+<td>{{x.derecha.divisor}}/{{x.derecha.dividendo}}={{x.derecha.rdivision}}
+<p></p>
+{{x.derecha.dividendo}}*{{x.derecha.rdivision}}={{x.derecha.multiplicacion}}
+<p></p>
+{{x.derecha.divisor}}-{{x.derecha.multiplicacion}}={{x.derecha.resta}}
+</td>
+
+<td>{{x.izquierda.derecha}}*{{x.izquierda.divisoriz}}={{x.izquierda.multiplicacion}}
+<p></p>
+
+{{x.izquierda.rizquierda}}-{{x.izquierda.multiplicacion}}={{x.izquierda.resta}}
+
+<span ng-show="x.izquierda.mod"><p></p> {{x.izquierda.resta}}mod({{r}})= {{x.izquierda.rmod}}</span>
+</td>
+
+</table>
+</div> 
+<p></p>
+
+<p></p>
+d:{{d}} entonces ({{d}}*{{e}}%{{r}})= {{d*e%r}}
+
+
+
+podemos concluir los siguientes parametros:<p></p>
+p:{{pprime}}<p></p>
+q:{{qprime}}<p></p>
+r:{{r}}<p></p>
+e:{{e}}<p></p>
+d:{{d}}<p></p>
+<h1>
+llave publica es (n,e) =({{pprime*qprime}},{{e}})<p></p>
+llave privada es (n,d)=({{pprime*qprime}},{{d}})<p></p>
+</h1>
+mensaje:<input type="text" ng-model="m">
+<p></p>
+
+calculamos el mensaje encriptado usamos la llave privada C=m^e(mod n)
+<p></p>
+para descifrar se calcula c usamos la llave publica  m=c^d (mod n)
+<p></p>
+<button type="button" ng-click="process(m)">Procesar</button>
+ 
+
+<table>
+<thead>
+    <tr>
+      <th>caracter</th>
+      <th>caracternumber</th>
+	  <th>encripted</th>
+	  <th>decifrado</th>
+	  <th>caracter decifrado</th>
+    </tr>
+  </thead>
+  <tr ng-repeat="x in textnumber">
+    <td header="'caracter'">{{ x.caracter }}</td>
+    <td header="'caracternumber'">{{ x.caracternumber }}</td>
+	<td header="'encripted'">{{ x.encripted }}</td>
+	<td header="'decripted'">{{ x.decripted }}</td>
+	<td title="'caracter'">{{ x.caracter }}</td>
+  </tr>
+</table>		
+             
+        </div>
+
+        <script src="angular.min.js"></script>
+        <script>
+        var miApp = angular.module('miApp',[]);
+
+        function miControlador($scope) {
+		$scope.process=process;
+
+		$scope.mcd= mcd;
+		$scope.pprime=5;
+		$scope.qprime=11;
+			$scope.r=0;
+			$scope.e=0;
+			$scope.d=0;
+		function isPrime(num) {
+    var prime = num != 1;
+    for (var i = 2; i < num; i++) {
+        if (num % i === 0) {
+            prime = false;
+            break;
+        }
+    }
+    return prime;
+	}
+
+function mcd(a, b) {
+    var m = a;
+    var n = b;
+if(a!=0 && b!=0)
+    var aux, bandera = true;
+    while (bandera) {
+        if (m < n) {
+            aux = m;
+            m = n;
+            n = aux;
+        } else if (m == n) {
+            return n;
+	$scope.mcdrsa=n;
+
+            bandera = false;
+
+        } else {
+            c = Math.floor(m / n);
+            r = m % n;
+            if (r == 0) {
+				$scope.mcdrsa=n;
+                bandera = false;
+            } else {
+                m = n;
+                n = r;
+            }
+        }
+    }
+	$scope.r=($scope.pprime-1)*($scope.qprime-1)
+	$scope.d=findD($scope.e,$scope.r);
+	
+	}
+
+var modexp = function(a, b, n) {
+  a = a % n;
+  var result = 1;
+  var x = a;
+
+  while(b > 0){
+    var leastSignificantBit = b % 2;
+    b = Math.floor(b / 2);
+
+    if (leastSignificantBit == 1) {
+      result = result * x;
+      result = result % n;
+    }
+
+    x = x * x;
+    x = x % n;
+  }
+  return result;
+};
+var mod = function (n, m) {
+    var remain = n % m;
+    return Math.floor(remain >= 0 ? remain : remain + m);
+};
+function findD(e,r)//extended euclidean e*d mod r=1
+{ var b=0;
+var derecha=0;
+var iz=0;
+var divisoriz=1;
+var divisorde=e;
+var rizquierda=r;
+var rderecha=r;
+var dProcess=[];
+$scope.listDproces=[];
+	while(divisorde!=1)
+	{
+	derecha=Math.floor(rderecha / divisorde);//5
+	var auxd=divisorde*derecha;//35
+	var auxd2=rderecha-auxd;//5
+	var	jsonderecha={divisor:rderecha, dividendo:divisorde , rdivision:derecha,//move to json
+					multiplicacion:auxd, resta: auxd2};
+	rderecha=divisorde;//7
+	divisorde=auxd2;//5
+	
+	
+	
+ 	var auxi=derecha*divisoriz;//5
+	var auxi2=rizquierda-auxi;//35
+	var	 jsonIzquierda={rizquierda:rizquierda,derecha:derecha, divisoriz:divisoriz,multiplicacion:auxi, resta: auxi2, mod:auxi2<0, rmod:mod(auxi2,r)};
+	rizquierda=divisoriz;
+	divisoriz=auxi2;
+	if(divisoriz<0)
+	{divisoriz=mod(divisoriz,r);}
+	
+	$scope.listDproces.push({derecha:jsonderecha,izquierda:jsonIzquierda});
+	}
+	return divisoriz;
+}
+
+function convertLetterToNumber(str) {
+   var anum={
+        a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9, j: 10, k: 11, 
+        l: 12, m: 13, n: 14,o: 15, p: 16, q: 17, r: 18, s: 19, t: 20, 
+        u: 21, v: 22, w: 23, x: 24, y: 25, z: 26,"0":27,"1":28,"2":29,"3":30,"4":31,"5":32,"6":33,
+		"7":34,"8":35,"9":36
+    }
+    if(str.length== 1) return anum[str] || 40;
+}
+
+function convertNumberToLetter(str) {
+   var anum={
+   "1":"a","2":"b","3":"c","4":"d","5":"e","6":"f","7":"g","8":"h","9":"i","10":"j","11":"k",
+        "12":"l","13":"m","14":"n","15":"p","16":"q","17":"r","18":"r","19":"s","20":"t",
+        "21":"u","22":"v","23":"w","24":"x","25":"y","26":"z","27":0,"28":1,"29":2,"30":3,"31":4,"32":5,"33":6,
+		"34":7,"35":8,"36":9
+        
+    }
+    if(str.length== 1) return anum[str] || 40;
+}
+function process(texto)
+{$scope.textnumber=[];
+var n=$scope.qprime*$scope.pprime;
+if(texto!=undefined && texto.length>0)
+{
+for( var i=0; i<texto.length; i++){
+var m=convertLetterToNumber(texto.charAt(i));
+var c=modexp(m,$scope.e,n);
+var mdecrip=modexp(c,$scope.d,n);
+	var aux={"caracter": texto.charAt(i),
+			"caracternumber":m,
+			"encripted":c,
+			"decripted":mdecrip,
+			"decrptedtext":convertNumberToLetter(mdecrip)};
+			$scope.textnumber.push(aux);
+}
+}
+}
+
+
+
+}
+        miApp.controller('miControlador', miControlador);
+		
+        </script>
+    </body>
+</html>
